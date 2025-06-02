@@ -13,6 +13,7 @@ import '../../pdfrx.dart';
 class PdfViewerParams {
   const PdfViewerParams({
     this.margin = 8.0,
+    this.marginRight = 0,
     this.backgroundColor = Colors.grey,
     this.layoutPages,
     this.normalizeMatrix,
@@ -67,6 +68,9 @@ class PdfViewerParams {
 
   /// Margin around the page.
   final double margin;
+  
+  /// Margin for vertical scroll bar
+  final double marginRight;
 
   /// Background color of the viewer.
   final Color backgroundColor;

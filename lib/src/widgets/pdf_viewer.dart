@@ -380,7 +380,7 @@ class _PdfViewerState extends State<PdfViewer> with SingleTickerProviderStateMix
             return selectableRegionInjector(
               LayoutBuilder(
                 builder: (context, constraints) {
-                  _updateLayout(Size(constraints.maxWidth, constraints.maxHeight));
+                  _updateLayout(Size(constraints.maxWidth - widget.params.marginRight, constraints.maxHeight));
                   return Stack(
                     children: [
                       iv.InteractiveViewer(
@@ -1175,7 +1175,7 @@ class _PdfViewerState extends State<PdfViewer> with SingleTickerProviderStateMix
 
   Matrix4 _calcMatrixForRect(Rect rect, {double? zoomMax, double? margin}) {
     margin ??= 0;
-    var zoom = min((_viewSize!.width - margin * 2) / rect.width, (_viewSize!.height - margin * 2) / rect.height);
+    var zoom = (_viewSize!.width - margin * 2) / rect.width;
     if (zoomMax != null && zoom > zoomMax) zoom = zoomMax;
     return _calcMatrixFor(rect.center, zoom: zoom, viewSize: _viewSize!);
   }
