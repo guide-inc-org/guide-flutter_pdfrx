@@ -783,15 +783,7 @@ class _PdfDocumentPdfium extends PdfDocument {
   }
 
   @override
-  Future<bool> assemble() async {
-    if (await _DocumentPageArranger.doShufflePagesInPlace(this)) {
-      subject.add(
-        PdfDocumentPageStatusChangedEvent(this, changes: {for (var p in pages) p.pageNumber: PdfPageStatusModified()}),
-      );
-      return true;
-    }
-    return false;
-  }
+  Future<bool> assemble() => _DocumentPageArranger.doShufflePagesInPlace(this);
 
   @override
   Future<Uint8List> encodePdf({bool incremental = false, bool removeSecurity = false}) async {
