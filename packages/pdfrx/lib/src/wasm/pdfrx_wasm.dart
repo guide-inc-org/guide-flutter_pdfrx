@@ -326,7 +326,7 @@ class PdfrxEntryFunctionsWasmImpl extends PdfrxEntryFunctions {
 class _PdfDocumentWasm extends PdfDocument {
   _PdfDocumentWasm._(this.document, {required super.sourceName, this.disposeCallback})
     : permissions = parsePermissions(document) {
-    pages = parsePages(this, document['pages'] as List<dynamic>);
+    _pages = parsePages(this, document['pages'] as List<dynamic>);
     updateMissingFonts(document['missingFonts']);
   }
 
@@ -402,7 +402,8 @@ class _PdfDocumentWasm extends PdfDocument {
         }
 
         if (!subject.isClosed) {
-          subject.add(PdfDocumentPageStatusChangedEvent(this, pagesLoaded));
+          final changes = {for (var p in pagesLoaded) p.pageNumber: PdfPageStatusModified()};
+          subject.add(PdfDocumentPageStatusChangedEvent(this, changes: changes));
         }
 
         updateMissingFonts(result['missingFonts']);
@@ -417,8 +418,15 @@ class _PdfDocumentWasm extends PdfDocument {
     });
   }
 
+  late final List<PdfPage> _pages;
+
   @override
-  late final List<PdfPage> pages;
+  List<PdfPage> get pages => _pages;
+
+  @override
+  set pages(List<PdfPage> value) {
+    throw UnimplementedError('Setting pages is not implemented for WASM backend.');
+  }
 
   void updateMissingFonts(Map<dynamic, dynamic>? missingFonts) {
     if (missingFonts == null || missingFonts.isEmpty) {
@@ -465,6 +473,16 @@ class _PdfDocumentWasm extends PdfDocument {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<bool> assemble() async {
+    throw UnimplementedError('assemble() is not implemented for WASM backend.');
+  }
+
+  @override
+  Future<Uint8List> encodePdf({bool incremental = false, bool removeSecurity = false}) async {
+    throw UnimplementedError('encodePdf() is not implemented for WASM backend.');
   }
 }
 
