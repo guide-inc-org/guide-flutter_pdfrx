@@ -432,7 +432,7 @@ abstract class PdfDocument {
   /// Assemble the document after modifying pages.
   Future<bool> assemble();
 
-  /// Save the PDF document and return the PDF data.
+  /// Save the PDF document.
   Future<Uint8List> encodePdf({bool incremental = false, bool removeSecurity = false});
 }
 

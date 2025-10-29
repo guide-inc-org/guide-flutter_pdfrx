@@ -796,10 +796,10 @@ class _PdfDocumentPdfium extends PdfDocument {
   @override
   Future<Uint8List> encodePdf({bool incremental = false, bool removeSecurity = false}) async {
     await assemble();
+    final byteBuffer = BytesBuilder();
     return await (await backgroundWorker).computeWithArena((arena, params) {
-      final output = Uint8List(0);
       int write(Pointer<pdfium_bindings.FPDF_FILEWRITE> pThis, Pointer<Void> pData, int size) {
-        output.addAll(Pointer<Uint8>.fromAddress(pData.address).asTypedList(size));
+        byteBuffer.add(Pointer<Uint8>.fromAddress(pData.address).asTypedList(size));
         return size;
       }
 
@@ -816,7 +816,7 @@ class _PdfDocumentPdfium extends PdfDocument {
           flags = params.incremental ? 1 : 2; // FPDF_INCREMENTAL(1) or FPDF_NO_INCREMENTAL(2)
         }
         pdfium.FPDF_SaveAsCopy(document, fw, flags);
-        return output;
+        return byteBuffer.toBytes();
       } finally {
         nativeWriteCallable.close();
       }
@@ -859,19 +859,18 @@ class _DocumentPageArranger with ShuffleItemsInPlaceMixin {
       final arranger = _DocumentPageArranger._(
         pdfium_bindings.FPDF_DOCUMENT.fromAddress(params.document),
         params.items,
-        params.length,
       );
       arranger.shuffleInPlaceAccordingToIndices(indices);
     }, (document: document.document.address, indices: indices, items: items, length: document.pages.length));
     return true;
   }
 
-  _DocumentPageArranger._(this.document, this.items, this.length);
+  _DocumentPageArranger._(this.document, this.items);
   final pdfium_bindings.FPDF_DOCUMENT document;
   final Map<int, ({int document, int pageNumber})> items;
 
   @override
-  int length;
+  int get length => pdfium.FPDF_GetPageCount(document);
 
   @override
   void move(int fromIndex, int toIndex, int count) {
