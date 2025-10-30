@@ -419,6 +419,11 @@ abstract class PdfDocument {
   List<PdfPage> get pages;
 
   /// Set pages.
+  ///
+  /// You can add [PdfPage] instances from any [PdfDocument] instances and the resulting document works correctly
+  /// if the referenced [PdfDocument] instances are alive; it's your responsibility to manage the lifetime of those
+  /// instances. To make the document independent from the source documents, you should call [assemble] after setting
+  /// the pages.
   set pages(List<PdfPage> value);
 
   /// Load outline (a.k.a. bookmark).
@@ -430,9 +435,15 @@ abstract class PdfDocument {
   bool isIdenticalDocumentHandle(Object? other);
 
   /// Assemble the document after modifying pages.
+  ///
+  /// You should call this function after modifying [pages] to make the document consistent and independent from
+  /// the other source documents. If [pages] contains pages from other documents, those documents must be alive
+  /// until this function returns.
   Future<bool> assemble();
 
   /// Save the PDF document.
+  ///
+  /// This function internally calls [assemble] before encoding the PDF.
   Future<Uint8List> encodePdf({bool incremental = false, bool removeSecurity = false});
 }
 
